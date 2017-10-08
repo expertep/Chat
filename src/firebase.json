@@ -1,0 +1,42 @@
+{
+  "chat" : {
+    "000001" : {
+      "time" : "16/10/2560 15.16:11",
+      "word" : "อะไร",
+      "sender" : "001",
+      "receiver" : "002"
+    },
+    "000002" : {
+      "time" : "16/10/2560 15.16:13",
+      "word" : "ว่าไง",
+      "sender" : "002",
+      "receiver" : "001"
+    }
+  },
+  "note" : {
+    "001" : {
+      "text" : "กินข้าว",
+      "time" : "16/10/2560",
+      "userA" : "001",
+      "userB" : "002"
+    }
+  },
+  "users" : {
+    "001" : {
+      "status" : "online",
+      "tmptext" : {
+        "receiver" : "002",
+        "text" : "ทำไ"
+      },
+      "username" : "ประหยัด"
+    },
+    "002" : {
+      "status" : "offline",
+      "tmptext" : {
+        "receiver" : "002",
+        "text" : "fu"
+      },
+      "username" : "ประหยุด"
+    }
+  }
+}
