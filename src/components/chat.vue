@@ -5,25 +5,53 @@
           <p class="menu-label">
             Friends
           </p>
+
           <ul class="menu-list">
-            <li v-for="user in users" class="user" :key="user['.key']">
-              <span>{{user.username}}</span>
+            <li v-for="(user, index) in users" @click="choosefriend(index)" :key="user['.key']">
+              <a :class="checkchoose(index)">
+                {{user.username}}
+                <span :class="onlinestatus(user.status)">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              </a>
             </li>
           </ul>
         </aside>
       </div>
       <div class="chatpanel column is-6">
-        <h1>chat</h1>
-        {{username}}
+        <h3 class="title is-3">{{chosenfriend}}</h3>
 
-        <div class="field">
-          <div class="control">
-            <textarea class="textarea" placeholder="Textarea"></textarea>
+        <div class="level">
+          <div class="level-left message">
+            <span class="sentence">แสฟ</span>
           </div>
-          <div class="control">
-            <button class="button is-primary">sent</button>
+          <div class="level-right message is-primary">
           </div>
         </div>
+
+        <div class="level">
+          <div class="level-left message">
+            <span class="sentence">greg</span>
+          </div>
+          <div class="level-right message is-primary">
+            <span class="sentence" v-if="tmptext != ''">{{tmptext}}</span>
+          </div>
+        </div>
+
+
+
+              <div class="field has-addons">
+                <div class="control">
+                  <textarea class="textarea is-danger" rows="1" v-model="tmptext" type="text" placeholder="What will you say ?"></textarea>
+                </div>
+                <div class="control">
+                  <a class="button  is-medium">
+                    <figure class="image is-24x24">
+                      <img src="../assets/sent.png" alt="">
+                    </figure>
+                  </a>
+                </div>
+              </div>
+
+
 
       </div>
       <div class="notepanel column is-4 is-hidden-mobile">
@@ -51,12 +79,37 @@ export default {
   name: 'chat',
   data () {
     return {
-      username: 's'
+      username: 's',
+      chosenfriend: 0,
+      tmptext: ''
     }
   },
   firebase: {
     users: usersRef,
     note: noteRef
+  },
+  computed: {
+    typing () {
+
+    }
+  },
+  methods: {
+    choosefriend (index) {
+      this.chosenfriend = index
+    },
+    checkchoose (index) {
+      var tmp = ''
+      if (this.chosenfriend === index) {
+        tmp = 'is-active'
+      }
+      return tmp
+    },
+    onlinestatus (status) {
+      if (status === 'online') {
+        return 'status online'
+      }
+      return 'status offline'
+    }
   }
 }
 </script>
@@ -68,13 +121,42 @@ export default {
     color : white;
   }
   .chatpanel {
-    color : white;
     background-color: rgb(46,46,46);
+    padding: 30px
   }
   .notepanel {
     color : white;
     background-color: rgb(46,46,46);
     border-left: 2px solid rgb(69, 69, 69);
+  }
+  .main {
+    height : 101vh;
+  }
+  .chatpanel  .field {
+    position: fixed;
+    bottom: 20px;
+
+  }
+  .textarea {
+    width: 40vw;
+    min-height: 45px;
+
+  }
+  .sentence {
+    padding : 10px;
+  }
+  .status {
+    border-radius: 50%;
+    display: inline;
+    font-size: 10px;
+    float: right;
+    margin-top: 5px;
+  }
+  .online {
+    background-color: #8fdf59;
+  }
+  .offline {
+    background-color: #878787;
   }
 
 </style>
