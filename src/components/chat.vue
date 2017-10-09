@@ -7,7 +7,7 @@
           </p>
 
           <ul class="menu-list">
-            <li v-for="(user, index) in users" @click="choosefriend(index)" :key="user['.key']">
+            <li v-for="(user,index) in users" @click="choosefriend(index)" :key="user['.key']">
               <a :class="checkchoose(index)">
                 {{user.username}}
                 <span :class="onlinestatus(user.status)">&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -19,9 +19,9 @@
       <div class="chatpanel column is-6">
         <h3 class="title is-3">{{chosenfriend}}</h3>
 
-        <div class="level">
+        <div class="level" v-for="text in conver" :key="text['.key']">
           <div class="level-left message">
-            <span class="sentence">แสฟ</span>
+            <span class="sentence">{{text.word}}</span>
           </div>
           <div class="level-right message is-primary">
           </div>
@@ -29,10 +29,12 @@
 
         <div class="level">
           <div class="level-left message">
-            <span class="sentence">greg</span>
+            <span class="sentence">
+              {{typingB}}
+            </span>
           </div>
           <div class="level-right message is-primary">
-            <span class="sentence" v-if="tmptext != ''">{{tmptext}}</span>
+            <span class="sentence" v-if="tmptextA != ''">{{typing}}</span>
           </div>
         </div>
 
@@ -40,7 +42,7 @@
 
               <div class="field has-addons">
                 <div class="control">
-                  <textarea class="textarea is-danger" rows="1" v-model="tmptext" type="text" placeholder="What will you say ?"></textarea>
+                  <textarea class="textarea is-danger" rows="1" v-model="tmptextA" type="text" placeholder="What will you say ?"></textarea>
                 </div>
                 <div class="control">
                   <a class="button  is-medium">
@@ -64,7 +66,7 @@
 </template>
 
 <script>
-var firebase = require('firebase')
+var firebase = require('firebase') // DB
 
 var config = {
   apiKey: 'AIzaSyD4lqtwAYmjp1B7orDSsztnOxhYAhQfFAk',
@@ -73,24 +75,33 @@ var config = {
   storageBucket: 'chat-fda99.appspot.com'
 }
 firebase.initializeApp(config)
-var usersRef = firebase.database().ref('users')
-var noteRef = firebase.database().ref('note')
+const db = firebase.database()
+
+var usersRef = db.ref('users')
+var noteRef = db.ref('note')
+var converRef = db.ref().child('000001')
+var typingARef = db.ref('/').child('users/001/tmptext/text')
+var typingBRef = db.ref('/').child('users/002/tmptext/text')
 export default {
   name: 'chat',
   data () {
     return {
       username: 's',
-      chosenfriend: 0,
-      tmptext: ''
+      chosenfriend: '002',
+      tmptextA: ''
     }
   },
   firebase: {
     users: usersRef,
-    note: noteRef
+    note: noteRef,
+    conver: converRef,
+    typingA: typingARef,
+    typingB: typingBRef
   },
   computed: {
     typing () {
-
+      typingARef.set(this.tmptextA)
+      return this.tmptextA
     }
   },
   methods: {
