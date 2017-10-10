@@ -68,11 +68,6 @@
           {{doc.text}}
         </div>
       </div>
-      <p>Click the following button to see the result: </p>
-
-      <form>
-         <input type="button" value="Click Me" onclick="getValue();" />
-      </form>
   </div>
 
 </template>
@@ -88,7 +83,6 @@ var config = {
 }
 firebase.initializeApp(config)
 const db = firebase.database()
-
 var usersRef = db.ref('users')
 var noteRef = db.ref('note')
 var typingARef = db.ref('/').child('users/001/tmptext/text')
@@ -102,7 +96,7 @@ export default {
     return {
       username: 's',
       id: '001',
-      chosenfriend: '002',
+      chosenfriend: '',
       tmptextA: '',
       tmptextB: '',
       inputtext: ''
@@ -155,11 +149,12 @@ export default {
       }
     }
   },
-  mounted: {
-    getValue () {
-      var retVal = prompt('Enter your name : ', 'your name here')
-      document.write('You have entered : ' + retVal)
-    }
+  mounted: function () {
+    /* var retVal = prompt('Enter your name : ', '')
+    var retVal1 = prompt('Enter your password : ', '')
+    this.id = retVal
+    this.name = retVal1 */
+
   }
 }
 </script>
