@@ -7,8 +7,8 @@
           </p>
 
           <ul class="menu-list">
-            <li v-for="(user,index) in users" @click="choosefriend(index)" :key="user['.key']">
-              <a :class="checkchoose(index)">
+            <li v-for="user in users" @click="choosefriend(user.id)" :key="user['.key']" v-if="user.id != id">
+              <a :class="checkchoose(user.id)">
                 {{user.username}}
                 <span :class="onlinestatus(user.status)">&nbsp;&nbsp;&nbsp;&nbsp;</span>
               </a>
@@ -19,22 +19,27 @@
       <div class="chatpanel column is-6">
         <h3 class="title is-3">{{chosenfriend}}</h3>
 
-        <div class="level" v-for="text in conver" :key="text['.key']">
+        <div class="level" v-for="text in conversation" :key="text['.key']">
           <div class="level-left message">
-            <span class="sentence">{{text.word}}</span>
+            <span class="sentence" v-if="text.sender == chosenfriend && text.receiver == id">
+              {{text.word}}
+            </span>
           </div>
           <div class="level-right message is-primary">
+            <span class="sentence" v-if="text.sender == id && text.receiver == chosenfriend">
+              {{text.word}}
+            </span>
           </div>
         </div>
 
         <div class="level">
           <div class="level-left message">
-            <span class="sentence">
-              {{typingB}}
+            <span class="sentence" v-for="typing in users" :key="typing['.key']" v-if="typing.id == chosenfriend && typing.tmptext.receiver == id">
+              {{typing.tmptext.text}}
             </span>
           </div>
           <div class="level-right message is-primary">
-            <span class="sentence" v-if="tmptextA != ''">{{typing}}</span>
+            <span class="sentence" v-if="tmptextA != ''"><p>{{typing}}</p></span>
           </div>
         </div>
 
@@ -42,10 +47,11 @@
 
               <div class="field has-addons">
                 <div class="control">
-                  <textarea class="textarea is-danger" rows="1" v-model="tmptextA" type="text" placeholder="What will you say ?"></textarea>
+                  <textarea class="textarea is-danger" rows="1" v-model="tmptextA" type="text" placeholder="What will you say ?" @keyup.enter="sent()">
+                  </textarea>
                 </div>
                 <div class="control">
-                  <a class="button  is-medium">
+                  <a class="button  is-medium" @click="sent()">
                     <figure class="image is-24x24">
                       <img src="../assets/sent.png" alt="">
                     </figure>
@@ -62,7 +68,13 @@
           {{doc.text}}
         </div>
       </div>
+      <p>Click the following button to see the result: </p>
+
+      <form>
+         <input type="button" value="Click Me" onclick="getValue();" />
+      </form>
   </div>
+
 </template>
 
 <script>
@@ -79,28 +91,36 @@ const db = firebase.database()
 
 var usersRef = db.ref('users')
 var noteRef = db.ref('note')
-var converRef = db.ref().child('000001')
 var typingARef = db.ref('/').child('users/001/tmptext/text')
-var typingBRef = db.ref('/').child('users/002/tmptext/text')
+var typingARefrec = db.ref('/').child('users/001/tmptext/receiver')
+var typingBRef = db.ref('/').child('users/002')
+var conversationRef = db.ref('chat').orderByChild('time').limitToLast(100)
+var sentRef = db.ref('chat')
 export default {
   name: 'chat',
   data () {
     return {
       username: 's',
+      id: '001',
       chosenfriend: '002',
-      tmptextA: ''
+      tmptextA: '',
+      tmptextB: '',
+      inputtext: ''
     }
   },
   firebase: {
     users: usersRef,
     note: noteRef,
-    conver: converRef,
     typingA: typingARef,
-    typingB: typingBRef
+    typingB: typingBRef,
+    typingArec: typingARefrec,
+    conversation: conversationRef,
+    sentText: sentRef
   },
   computed: {
     typing () {
       typingARef.set(this.tmptextA)
+      typingARefrec.set(this.chosenfriend)
       return this.tmptextA
     }
   },
@@ -120,6 +140,25 @@ export default {
         return 'status online'
       }
       return 'status offline'
+    },
+    sent () {
+      if (this.tmptextA !== ' ' || this.tmptextA !== '') {
+        var d = new Date()
+        var timecode = d.getTime()
+        sentRef.push({
+          receiver: this.chosenfriend,
+          sender: this.id,
+          word: this.tmptextA,
+          time: timecode
+        })
+        this.tmptextA = ''
+      }
+    }
+  },
+  mounted: {
+    getValue () {
+      var retVal = prompt('Enter your name : ', 'your name here')
+      document.write('You have entered : ' + retVal)
     }
   }
 }
@@ -155,6 +194,7 @@ export default {
   }
   .sentence {
     padding : 10px;
+    max-width: 30vw;
   }
   .status {
     border-radius: 50%;

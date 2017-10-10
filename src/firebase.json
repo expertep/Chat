@@ -23,6 +23,7 @@
   },
   "users" : {
     "001" : {
+      "id" : "001",
       "status" : "online",
       "tmptext" : {
         "receiver" : "002",
@@ -31,9 +32,10 @@
       "username" : "ประหยัด"
     },
     "002" : {
+      "id" : "002",
       "status" : "offline",
       "tmptext" : {
-        "receiver" : "002",
+        "receiver" : "001",
         "text" : "fu"
       },
       "username" : "ประหยุด"
