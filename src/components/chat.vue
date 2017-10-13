@@ -17,9 +17,11 @@
         </aside>
       </div>
       <div class="chatpanel column is-6">
-        <h3 class="title is-3">{{chosenfriend}}</h3>
+        <div class=""  v-for="user in users" :key="user['.key']" v-if="user.id == chosenfriend">
+          <h3 class="title is-3">{{user.username}}<span :class="onlinestatus(user.status)">&nbsp;&nbsp;&nbsp;&nbsp;</span></h3>
+        </div>
 
-        <div class="level" v-for="text in conversation" :key="text['.key']">
+        <div class="level" v-for="text in conversation" :key="text['.key']" v-if="text.sender == chosenfriend && text.receiver == id || text.sender == id && text.receiver == chosenfriend">
           <div class="level-left message">
             <span class="sentence" v-if="text.sender == chosenfriend && text.receiver == id">
               {{text.word}}
@@ -32,7 +34,7 @@
           </div>
         </div>
 
-        <div class="level">
+        <div class="level tmp">
           <div class="level-left message">
             <span class="sentence" v-for="typing in users" :key="typing['.key']" v-if="typing.id == chosenfriend && typing.tmptext.receiver == id">
               {{typing.tmptext.text}}
@@ -85,9 +87,6 @@ firebase.initializeApp(config)
 const db = firebase.database()
 var usersRef = db.ref('users')
 var noteRef = db.ref('note')
-var typingARef = db.ref('/').child('users/001/tmptext/text')
-var typingARefrec = db.ref('/').child('users/001/tmptext/receiver')
-var typingBRef = db.ref('/').child('users/002')
 var conversationRef = db.ref('chat').orderByChild('time').limitToLast(100)
 var sentRef = db.ref('chat')
 export default {
@@ -105,16 +104,13 @@ export default {
   firebase: {
     users: usersRef,
     note: noteRef,
-    typingA: typingARef,
-    typingB: typingBRef,
-    typingArec: typingARefrec,
     conversation: conversationRef,
     sentText: sentRef
   },
   computed: {
     typing () {
-      typingARef.set(this.tmptextA)
-      typingARefrec.set(this.chosenfriend)
+      usersRef.child(this.id + '/tmptext/text').set(this.tmptextA)
+      usersRef.child(this.id + '/tmptext/receiver').set(this.chosenfriend)
       return this.tmptextA
     }
   },
@@ -150,16 +146,15 @@ export default {
     }
   },
   mounted: function () {
-    /* var retVal = prompt('Enter your name : ', '')
-    var retVal1 = prompt('Enter your password : ', '')
-    this.id = retVal
-    this.name = retVal1 */
-
+    var retVal = prompt('Enter your name : ', '')
+    var retVal1 = prompt('Enter your id : ', '')
+    this.id = retVal1
+    this.name = retVal
+    usersRef.child(this.id + '/status').set('online')
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
+<!-- Add "scoped" attribute to lmit CSS to this component only -->
 <style scoped>
   .friendspanel {
     background-color: rgb(55,55,55);
@@ -204,5 +199,7 @@ export default {
   .offline {
     background-color: #878787;
   }
-
+  .tmp {
+    opacity: 0.2;
+  }
 </style>
