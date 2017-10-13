@@ -36,7 +36,7 @@
 
         <div class="level tmp">
           <div class="level-left message">
-            <span class="sentence" v-for="typing in users" :key="typing['.key']" v-if="typing.id == chosenfriend && typing.tmptext.receiver == id">
+            <span class="sentence" v-for="typing in users" :key="typing['.key']" v-if="typing.id == chosenfriend && typing.tmptext.receiver == id && typing.tmptext.text != '' && typing.tmptext.text.length > 1">
               {{typing.tmptext.text}}
             </span>
           </div>
@@ -142,12 +142,13 @@ export default {
           time: timecode
         })
         this.tmptextA = ''
+        usersRef.child(this.id + '/tmptext/text').set('')
       }
     }
   },
   mounted: function () {
     var retVal = prompt('Enter your name : ', '')
-    var retVal1 = prompt('Enter your id : ', '')
+    var retVal1 = prompt('Enter your id : ex 001,002', '')
     this.id = retVal1
     this.name = retVal
     usersRef.child(this.id + '/status').set('online')
@@ -162,7 +163,8 @@ export default {
   }
   .chatpanel {
     background-color: rgb(46,46,46);
-    padding: 30px
+    padding: 30px;
+    overflow: scroll;
   }
   .notepanel {
     color : white;
